@@ -283,19 +283,27 @@ class MonitorMetrics(Callback, ABC):
                             2,
                             3,
                         ], "Invalid image shape for storing, set the save_image flag appropriately if you are dealing with tabular data!"
-                        transformed_pil = TVF.to_pil_image(single_datapoint_transformed)
-                        normal_pil = TVF.to_pil_image(single_datapoint)
 
-                        mlflow.log_image(
-                            transformed_pil,
-                            self.samples_with_transform_image_fstr.format(sample_idx=current_idx),
-                        )
-                        mlflow.log_image(
-                            normal_pil,
-                            self.samples_without_transform_image_fstr.format(
-                                sample_idx=current_idx
-                            ),
-                        )
+                        try:
+                            transformed_pil = TVF.to_pil_image(single_datapoint_transformed)
+                            mlflow.log_image(
+                                transformed_pil,
+                                self.samples_with_transform_image_fstr.format(sample_idx=current_idx),
+                            )
+                        except Exception as e:
+                            pass
+                        
+                        try:
+                            normal_pil = TVF.to_pil_image(single_datapoint)
+                            mlflow.log_image(
+                                normal_pil,
+                                self.samples_without_transform_image_fstr.format(
+                                    sample_idx=current_idx
+                                ),
+                            )
+                        except Exception as e:
+                            pass
+
                         current_idx += 1
                 else:
                     current_idx += self.batch_size
